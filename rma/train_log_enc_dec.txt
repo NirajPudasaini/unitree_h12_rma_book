@@ -1,0 +1,1003 @@
+Warp CUDA error: Failed to get driver entry point 'cuDeviceGetUuid' (CUDA error 1)
+Warp CUDA error: Function cuDeviceGetUuid_f: a suitable driver entry point was not found
+Warp CUDA error 36: API call is not supported in the installed CUDA driver (in function cuda_init, /builds/omniverse/warp/warp/native/warp.cu:277)
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/niraj/isaac_projects/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: unitree_h12_sim2sim.tasks.manager_based.unitree_h12_sim2sim.unitree_h12_walk_rma_cfg:H12LocomotionFullBodyRmaEnvCfg
+[INFO]: Parsing configuration from: unitree_h12_sim2sim.tasks.manager_based.unitree_h12_sim2sim.agents.rsl_rl_ppo_walk_rma_cfg:PPORunnerCfg
+[Warning] [simulation_app.simulation_app] Modules: ['omni.kit_app'] were loaded before SimulationApp was started and might not be loaded correctly.
+[Warning] [simulation_app.simulation_app] Please check to make sure no extra omniverse or pxr modules are imported before the call to SimulationApp(...)
+Loading user config located at: '/home/niraj/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/omni/data/Kit/Isaac-Sim/5.0/user.config.json'
+[Info] [carb] Logging to file: /home/niraj/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/omni/logs/Kit/Isaac-Sim/5.0/kit_20260128_153500.log
+2026-01-28T22:35:00Z [156ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-01-28T22:35:01Z [717ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.95.05     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5070 Ti       | Yes: 0 |     | 16303   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2c05      | e37badbf.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-90-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101004 (1.21.1.4)
+| Processor: Intel(R) Core(TM) i7-14700F
+| Bare Metal Cores: 20 | Bare Metal Logical Cores: 40
+| Available Cores:  28 
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 31878 | Free Memory: 16190
+| Total Page/Swap (MB): 8191 | Free Page/Swap: 5633
+|---------------------------------------------------------------------------------------------|
+2026-01-28T22:35:06Z [5,569ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-01-28T22:35:06Z [5,575ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-01-28T22:35:06Z [5,608ms] [Warning] [omni.kvdb.plugin] Disabling key-value database because another kit process is locking it
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.95.05     | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5070 Ti       | Yes: 0 |     | 16303   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2c05      | e37badbf.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-90-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101004 (1.21.1.4)
+| Processor: Intel(R) Core(TM) i7-14700[INFO] Logging experiment in directory: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma
+Exact experiment name requested from command line: 2026-01-28_15-35-07
+Setting seed: 42
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took : 0.588013 seconds
+[INFO]: Time taken for scene creation : 6.863729 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 4.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 5.904299 seconds
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+---------------+------------------------+
+| Index | Name          |          Type          |
++-------+---------------+------------------------+
+|   0   | base_velocity | UniformVelocityCommand |
++-------+---------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 3 active terms.
++--------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+---------------------------+
+|  Index   | Name                      |
++----------+---------------------------+
+|    0     | physics_material          |
+|    1     | add_base_mass             |
++----------+---------------------------+
++---------------------------------------+
+|  Active Event Terms in Mode: 'reset'  |
++--------+------------------------------+
+| Index  | Name                         |
++--------+------------------------------+
+|   0    | base_external_force_torque   |
+|   1    | reset_base                   |
+|   2    | reset_robot_joints           |
+|   3    | rma_env_factors              |
+|   4    | rma_debug_print_once         |
+|   5    | rma_verify_apply_once        |
++--------+------------------------------+
++---------------------------------------------------+
+|       Active Event Terms in Mode: 'interval'      |
++-------+-----------------+-------------------------+
+| Index | Name            | Interval time range (s) |
++-------+-----------------+-------------------------+
+|   0   | push_robot      |        (5.0, 5.0)       |
+|   1   | rma_debug_print |       (0.02, 0.02)      |
++-------+-----------------+-------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 1 active terms.
++-------------------------------------+
+|   Active Action Terms (shape: 27)   |
++--------+---------------+------------+
+| Index  | Name          |  Dimension |
++--------+---------------+------------+
+|   0    | joint_effort  |         27 |
++--------+---------------+------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 2 groups.
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (490,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_ang_vel                   |    (15,)    |
+|     1     | projected_gravity              |    (15,)    |
+|     2     | velocity_commands              |    (15,)    |
+|     3     | joint_pos_rel                  |    (135,)   |
+|     4     | joint_vel_rel                  |    (135,)   |
+|     5     | last_action                    |    (135,)   |
+|     6     | rma_extrinsics                 |    (40,)    |
++-----------+--------------------------------+-------------+
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (550,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_lin_vel                   |    (15,)    |
+|     1     | base_ang_vel                   |    (15,)    |
+|     2     | projected_gravity              |    (15,)    |
+|     3     | velocity_commands              |    (15,)    |
+|     4     | joint_pos_rel                  |    (135,)   |
+|     5     | joint_vel_rel                  |    (135,)   |
+|     6     | last_action                    |    (135,)   |
+|     7     | rma_env_factors                |    (85,)    |
++-----------+--------------------------------+-------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 3 active terms.
++------------------------------------+
+|      Active Termination Terms      |
++-------+-----------------+----------+
+| Index | Name            | Time Out |
++-------+-----------------+----------+
+|   0   | time_out        |   True   |
+|   1   | base_height     |  False   |
+|   2   | bad_orientation |  False   |
++-------+-----------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 18 active terms.
++-------------------------------------------+
+|            Active Reward Terms            |
++-------+------------------------+----------+
+| Index | Name                   |   Weight |
++-------+------------------------+----------+
+|   0   | track_lin_vel_xy       |      5.0 |
+|   1   | alive                  |     0.15 |
+|   2   | base_linear_velocity   |     -2.0 |
+|   3   | base_angular_velocity  |    -0.05 |
+|   4   | joint_vel              |   -0.001 |
+|   5   | joint_acc              | -2.5e-07 |
+|   6   | action_rate            |    -0.05 |
+|   7   | dof_pos_limits         |     -5.0 |
+|   8   | energy                 |   -2e-05 |
+|   9   | joint_deviation_legs   |     -1.0 |
+|   10  | joint_deviation_arms   |     -0.1 |
+|   11  | joint_deviation_waists |       -1 |
+|   12  | flat_orientation_l2    |     -5.0 |
+|   13  | base_height            |      -10 |
+|   14  | gait                   |      0.5 |
+|   15  | feet_slide             |     -0.2 |
+|   16  | feet_clearance         |      1.0 |
+|   17  | undesired_contacts     |       -1 |
++-------+------------------------+----------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 2 active terms.
++----------------------------+
+|  Active Curriculum Terms   |
++-------+--------------------+
+| Index | Name               |
++-------+--------------------+
+|   0   | terrain_levels     |
+|   1   | lin_vel_cmd_levels |
++-------+--------------------+
+
+[INFO]: Completed setting up the environment...
+[RMA:verify] sampled e_t | down_force=21.903/17.575/26.231 N | leg_strength=0.996/0.909/1.092 | friction=1.000/1.000/1.000
+[RMA:verify] readback leg effort limits (absolute) mean/min/max=207.581/69.392/327.602
+[RMA:verify] readback ground friction (absolute)=1.000
+[RMA:verify] friction delta (actual - expected mean)=+0.0000 (baseline=1.000)
+ActorCritic.__init__ got unexpected arguments, which will be ignored: ['actor_obs_normalization', 'critic_obs_normalization']
+Actor MLP: SimpleMLP(
+  (layers): Sequential(
+    (0): Linear(in_features=490, out_features=256, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=256, out_features=128, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=128, out_features=27, bias=True)
+  )
+)
+Critic MLP: SimpleMLP(
+  (layers): Sequential(
+    (0): Linear(in_features=550, out_features=256, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=256, out_features=128, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+
+[INFO] Starting joint policy + encoder/decoder training
+[INFO] Policy iterations: 1000
+[INFO] Encoder/decoder trained alongside policy each iteration
+
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 58079 steps/s (collection: 1.512s, learning 0.181s)
+             Mean action noise std: 1.00
+          Mean value_function loss: 0.5784
+               Mean surrogate loss: -0.0032
+                 Mean entropy loss: 38.2452
+                       Mean reward: -2.45
+               Mean episode length: 18.00
+   Episode_Reward/track_lin_vel_xy: 0.0028
+              Episode_Reward/alive: 0.0007
+Episode_Reward/base_linear_velocity: -0.0140
+Episode_Reward/base_angular_velocity: -0.0022
+          Episode_Reward/joint_vel: -0.0013
+          Episode_Reward/joint_acc: -0.0009
+        Episode_Reward/action_rate: -0.0135
+     Episode_Reward/dof_pos_limits: -0.0001
+             Episode_Reward/energy: -0.0002
+Episode_Reward/joint_deviation_legs: -0.0014
+Episode_Reward/joint_deviation_arms: -0.0005
+Episode_Reward/joint_deviation_waists: -0.0003
+Episode_Reward/flat_orientation_l2: -0.0049
+        Episode_Reward/base_height: -0.0019
+               Episode_Reward/gait: 0.0020
+         Episode_Reward/feet_slide: -0.0009
+     Episode_Reward/feet_clearance: 0.0015
+ Episode_Reward/undesired_contacts: -0.0006
+         Curriculum/terrain_levels: 0.9987
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0062
+Metrics/base_velocity/error_vel_yaw: 0.0188
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 0.0001
+--------------------------------------------------------------------------------
+                   Total timesteps: 98304
+                    Iteration time: 1.69s
+                      Time elapsed: 00:00:01
+                               ETA: 00:00:01
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+Storing git history for 'unitree_h12_rma' in: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 1 files: ['/home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log']
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 63555 steps/s (collection: 1.484s, learning 0.063s)
+             Mean action noise std: 0.99
+          Mean value_function loss: 0.5490
+               Mean surrogate loss: -0.0070
+                 Mean entropy loss: 38.2100
+                       Mean reward: -2.42
+               Mean episode length: 24.00
+   Episode_Reward/track_lin_vel_xy: 0.0368
+              Episode_Reward/alive: 0.0051
+Episode_Reward/base_linear_velocity: -0.0179
+Episode_Reward/base_angular_velocity: -0.0077
+          Episode_Reward/joint_vel: -0.0083
+          Episode_Reward/joint_acc: -0.0081
+        Episode_Reward/action_rate: -0.0933
+     Episode_Reward/dof_pos_limits: -0.0020
+             Episode_Reward/energy: -0.0010
+Episode_Reward/joint_deviation_legs: -0.0102
+Episode_Reward/joint_deviation_arms: -0.0037
+Episode_Reward/joint_deviation_waists: -0.0026
+Episode_Reward/flat_orientation_l2: -0.0238
+        Episode_Reward/base_height: -0.0069
+               Episode_Reward/gait: 0.0144
+         Episode_Reward/feet_slide: -0.0050
+     Episode_Reward/feet_clearance: 0.0228
+ Episode_Reward/undesired_contacts: -0.0400
+         Curriculum/terrain_levels: 0.9436
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0600
+Metrics/base_velocity/error_vel_yaw: 0.1162
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 0.0657
+--------------------------------------------------------------------------------
+                   Total timesteps: 196608
+                    Iteration time: 1.55s
+                      Time elapsed: 00:00:03
+                               ETA: 00:00:03
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 87903 steps/s (collection: 1.055s, learning 0.064s)
+             Mean action noise std: 0.99
+          Mean value_function loss: 0.2651
+               Mean surrogate loss: -0.0079
+                 Mean entropy loss: 38.1316
+                       Mean reward: -2.27
+               Mean episode length: 22.96
+   Episode_Reward/track_lin_vel_xy: 0.0811
+              Episode_Reward/alive: 0.0089
+Episode_Reward/base_linear_velocity: -0.0107
+Episode_Reward/base_angular_velocity: -0.0092
+          Episode_Reward/joint_vel: -0.0136
+          Episode_Reward/joint_acc: -0.0138
+        Episode_Reward/action_rate: -0.1622
+     Episode_Reward/dof_pos_limits: -0.0025
+             Episode_Reward/energy: -0.0015
+Episode_Reward/joint_deviation_legs: -0.0174
+Episode_Reward/joint_deviation_arms: -0.0065
+Episode_Reward/joint_deviation_waists: -0.0045
+Episode_Reward/flat_orientation_l2: -0.0283
+        Episode_Reward/base_height: -0.0087
+               Episode_Reward/gait: 0.0258
+         Episode_Reward/feet_slide: -0.0081
+     Episode_Reward/feet_clearance: 0.0472
+ Episode_Reward/undesired_contacts: -0.0901
+         Curriculum/terrain_levels: 0.4040
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0978
+Metrics/base_velocity/error_vel_yaw: 0.1998
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 0.7122
+--------------------------------------------------------------------------------
+                   Total timesteps: 294912
+                    Iteration time: 1.12s
+                      Time elapsed: 00:00:04
+                               ETA: 00:00:04
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 82950 steps/s (collection: 1.121s, learning 0.064s)
+             Mean action noise std: 0.99
+          Mean value_function loss: 0.2668
+               Mean surrogate loss: -0.0119
+                 Mean entropy loss: 38.0175
+                       Mean reward: -2.30
+               Mean episode length: 24.00
+   Episode_Reward/track_lin_vel_xy: 0.0813
+              Episode_Reward/alive: 0.0087
+Episode_Reward/base_linear_velocity: -0.0107
+Episode_Reward/base_angular_velocity: -0.0090
+          Episode_Reward/joint_vel: -0.0132
+          Episode_Reward/joint_acc: -0.0132
+        Episode_Reward/action_rate: -0.1568
+     Episode_Reward/dof_pos_limits: -0.0023
+             Episode_Reward/energy: -0.0015
+Episode_Reward/joint_deviation_legs: -0.0169
+Episode_Reward/joint_deviation_arms: -0.0063
+Episode_Reward/joint_deviation_waists: -0.0044
+Episode_Reward/flat_orientation_l2: -0.0284
+        Episode_Reward/base_height: -0.0085
+               Episode_Reward/gait: 0.0247
+         Episode_Reward/feet_slide: -0.0078
+     Episode_Reward/feet_clearance: 0.0458
+ Episode_Reward/undesired_contacts: -0.0861
+         Curriculum/terrain_levels: 0.1858
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0941
+Metrics/base_velocity/error_vel_yaw: 0.1962
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 0.9652
+--------------------------------------------------------------------------------
+                   Total timesteps: 393216
+                    Iteration time: 1.19s
+                      Time elapsed: 00:00:05
+                               ETA: 00:00:05
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+[RMA:e_t] step=100 e_t stats over 4096 envs | force(mean/min/max)=25.211/0.007/49.979 N | leg_strength=1.000/0.900/1.100 | friction=1.000/1.000/1.000
+[RMA:e_t] sample env_ids=[0, 1] e_t[:2]=[[1.3747920e+01 9.2994189e-01 9.1329628e-01 9.6226531e-01 1.0382648e+00
+  1.0999023e+00 9.0939522e-01 1.0698117e+00 1.0558468e+00 1.0049785e+00
+  1.0831590e+00 9.4510955e-01 1.0502144e+00 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]
+ [2.1966965e+01 9.4707835e-01 1.0347215e+00 1.0388221e+00 1.0527372e+00
+  1.0702038e+00 9.7675818e-01 9.9848527e-01 9.8858231e-01 9.9692625e-01
+  1.0213678e+00 9.1897333e-01 9.4798583e-01 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]]
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 84185 steps/s (collection: 1.105s, learning 0.062s)
+             Mean action noise std: 0.99
+          Mean value_function loss: 0.1928
+               Mean surrogate loss: -0.0073
+                 Mean entropy loss: 37.9528
+                       Mean reward: -2.23
+               Mean episode length: 23.51
+   Episode_Reward/track_lin_vel_xy: 0.0710
+              Episode_Reward/alive: 0.0081
+Episode_Reward/base_linear_velocity: -0.0100
+Episode_Reward/base_angular_velocity: -0.0086
+          Episode_Reward/joint_vel: -0.0123
+          Episode_Reward/joint_acc: -0.0125
+        Episode_Reward/action_rate: -0.1453
+     Episode_Reward/dof_pos_limits: -0.0021
+             Episode_Reward/energy: -0.0014
+Episode_Reward/joint_deviation_legs: -0.0156
+Episode_Reward/joint_deviation_arms: -0.0059
+Episode_Reward/joint_deviation_waists: -0.0041
+Episode_Reward/flat_orientation_l2: -0.0273
+        Episode_Reward/base_height: -0.0083
+               Episode_Reward/gait: 0.0240
+         Episode_Reward/feet_slide: -0.0075
+     Episode_Reward/feet_clearance: 0.0423
+ Episode_Reward/undesired_contacts: -0.0808
+         Curriculum/terrain_levels: 0.0926
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0920
+Metrics/base_velocity/error_vel_yaw: 0.1813
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 0.9960
+--------------------------------------------------------------------------------
+                   Total timesteps: 491520
+                    Iteration time: 1.17s
+                      Time elapsed: 00:00:06
+                               ETA: 00:00:06
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 81879 steps/s (collection: 1.128s, learning 0.073s)
+             Mean action noise std: 0.98
+          Mean value_function loss: 0.1836
+               Mean surrogate loss: -0.0056
+                 Mean entropy loss: 37.8784
+                       Mean reward: -2.30
+               Mean episode length: 23.70
+   Episode_Reward/track_lin_vel_xy: 0.0763
+              Episode_Reward/alive: 0.0085
+Episode_Reward/base_linear_velocity: -0.0104
+Episode_Reward/base_angular_velocity: -0.0088
+          Episode_Reward/joint_vel: -0.0128
+          Episode_Reward/joint_acc: -0.0134
+        Episode_Reward/action_rate: -0.1506
+     Episode_Reward/dof_pos_limits: -0.0024
+             Episode_Reward/energy: -0.0014
+Episode_Reward/joint_deviation_legs: -0.0162
+Episode_Reward/joint_deviation_arms: -0.0062
+Episode_Reward/joint_deviation_waists: -0.0042
+Episode_Reward/flat_orientation_l2: -0.0281
+        Episode_Reward/base_height: -0.0084
+               Episode_Reward/gait: 0.0245
+         Episode_Reward/feet_slide: -0.0076
+     Episode_Reward/feet_clearance: 0.0442
+ Episode_Reward/undesired_contacts: -0.0837
+         Curriculum/terrain_levels: 0.0375
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0935
+Metrics/base_velocity/error_vel_yaw: 0.1889
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 0.9997
+--------------------------------------------------------------------------------
+                   Total timesteps: 589824
+                    Iteration time: 1.20s
+                      Time elapsed: 00:00:07
+                               ETA: 00:00:07
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 78972 steps/s (collection: 1.179s, learning 0.066s)
+             Mean action noise std: 0.98
+          Mean value_function loss: 0.2422
+               Mean surrogate loss: -0.0055
+                 Mean entropy loss: 37.8303
+                       Mean reward: -2.16
+               Mean episode length: 23.74
+   Episode_Reward/track_lin_vel_xy: 0.0715
+              Episode_Reward/alive: 0.0080
+Episode_Reward/base_linear_velocity: -0.0101
+Episode_Reward/base_angular_velocity: -0.0085
+          Episode_Reward/joint_vel: -0.0120
+          Episode_Reward/joint_acc: -0.0122
+        Episode_Reward/action_rate: -0.1414
+     Episode_Reward/dof_pos_limits: -0.0020
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0152
+Episode_Reward/joint_deviation_arms: -0.0059
+Episode_Reward/joint_deviation_waists: -0.0040
+Episode_Reward/flat_orientation_l2: -0.0272
+        Episode_Reward/base_height: -0.0081
+               Episode_Reward/gait: 0.0228
+         Episode_Reward/feet_slide: -0.0074
+     Episode_Reward/feet_clearance: 0.0418
+ Episode_Reward/undesired_contacts: -0.0798
+         Curriculum/terrain_levels: 0.0182
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0900
+Metrics/base_velocity/error_vel_yaw: 0.1784
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 688128
+                    Iteration time: 1.24s
+                      Time elapsed: 00:00:09
+                               ETA: 00:00:09
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 78507 steps/s (collection: 1.183s, learning 0.069s)
+             Mean action noise std: 0.98
+          Mean value_function loss: 0.1745
+               Mean surrogate loss: -0.0104
+                 Mean entropy loss: 37.7520
+                       Mean reward: -2.21
+               Mean episode length: 23.64
+   Episode_Reward/track_lin_vel_xy: 0.0754
+              Episode_Reward/alive: 0.0083
+Episode_Reward/base_linear_velocity: -0.0101
+Episode_Reward/base_angular_velocity: -0.0086
+          Episode_Reward/joint_vel: -0.0124
+          Episode_Reward/joint_acc: -0.0123
+        Episode_Reward/action_rate: -0.1455
+     Episode_Reward/dof_pos_limits: -0.0021
+             Episode_Reward/energy: -0.0014
+Episode_Reward/joint_deviation_legs: -0.0159
+Episode_Reward/joint_deviation_arms: -0.0061
+Episode_Reward/joint_deviation_waists: -0.0042
+Episode_Reward/flat_orientation_l2: -0.0275
+        Episode_Reward/base_height: -0.0082
+               Episode_Reward/gait: 0.0240
+         Episode_Reward/feet_slide: -0.0074
+     Episode_Reward/feet_clearance: 0.0435
+ Episode_Reward/undesired_contacts: -0.0826
+         Curriculum/terrain_levels: 0.0086
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0915
+Metrics/base_velocity/error_vel_yaw: 0.1840
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 786432
+                    Iteration time: 1.25s
+                      Time elapsed: 00:00:10
+                               ETA: 00:00:10
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+[RMA:e_t] step=200 e_t stats over 4096 envs | force(mean/min/max)=24.965/0.006/49.997 N | leg_strength=1.000/0.900/1.100 | friction=1.000/1.000/1.000
+[RMA:e_t] sample env_ids=[0, 1] e_t[:2]=[[2.6974096e+01 9.0053719e-01 9.8790711e-01 9.4685239e-01 9.7494358e-01
+  1.0772637e+00 1.0938561e+00 9.1973013e-01 1.0122700e+00 1.0723691e+00
+  1.0681186e+00 1.0882019e+00 1.0885874e+00 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]
+ [2.3728094e+01 1.0555696e+00 9.9170077e-01 1.0930506e+00 9.0609342e-01
+  1.0468360e+00 9.4728136e-01 9.7901738e-01 1.0417510e+00 9.6475172e-01
+  9.3543339e-01 9.6992362e-01 9.3639350e-01 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]]
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 78848 steps/s (collection: 1.177s, learning 0.070s)
+             Mean action noise std: 0.97
+          Mean value_function loss: 0.1416
+               Mean surrogate loss: -0.0099
+                 Mean entropy loss: 37.6403
+                       Mean reward: -2.29
+               Mean episode length: 23.84
+   Episode_Reward/track_lin_vel_xy: 0.0733
+              Episode_Reward/alive: 0.0079
+Episode_Reward/base_linear_velocity: -0.0101
+Episode_Reward/base_angular_velocity: -0.0083
+          Episode_Reward/joint_vel: -0.0118
+          Episode_Reward/joint_acc: -0.0122
+        Episode_Reward/action_rate: -0.1375
+     Episode_Reward/dof_pos_limits: -0.0020
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0150
+Episode_Reward/joint_deviation_arms: -0.0058
+Episode_Reward/joint_deviation_waists: -0.0039
+Episode_Reward/flat_orientation_l2: -0.0273
+        Episode_Reward/base_height: -0.0080
+               Episode_Reward/gait: 0.0228
+         Episode_Reward/feet_slide: -0.0072
+     Episode_Reward/feet_clearance: 0.0412
+ Episode_Reward/undesired_contacts: -0.0785
+         Curriculum/terrain_levels: 0.0035
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0872
+Metrics/base_velocity/error_vel_yaw: 0.1747
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 884736
+                    Iteration time: 1.25s
+                      Time elapsed: 00:00:11
+                               ETA: 00:00:11
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 77401 steps/s (collection: 1.204s, learning 0.066s)
+             Mean action noise std: 0.97
+          Mean value_function loss: 0.1490
+               Mean surrogate loss: -0.0079
+                 Mean entropy loss: 37.5983
+                       Mean reward: -2.22
+               Mean episode length: 23.63
+   Episode_Reward/track_lin_vel_xy: 0.0755
+              Episode_Reward/alive: 0.0081
+Episode_Reward/base_linear_velocity: -0.0100
+Episode_Reward/base_angular_velocity: -0.0084
+          Episode_Reward/joint_vel: -0.0120
+          Episode_Reward/joint_acc: -0.0119
+        Episode_Reward/action_rate: -0.1405
+     Episode_Reward/dof_pos_limits: -0.0021
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0154
+Episode_Reward/joint_deviation_arms: -0.0060
+Episode_Reward/joint_deviation_waists: -0.0041
+Episode_Reward/flat_orientation_l2: -0.0275
+        Episode_Reward/base_height: -0.0080
+               Episode_Reward/gait: 0.0232
+         Episode_Reward/feet_slide: -0.0073
+     Episode_Reward/feet_clearance: 0.0423
+ Episode_Reward/undesired_contacts: -0.0807
+         Curriculum/terrain_levels: 0.0016
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0886
+Metrics/base_velocity/error_vel_yaw: 0.1799
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 983040
+                    Iteration time: 1.27s
+                      Time elapsed: 00:00:12
+                               ETA: 00:00:12
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 79099 steps/s (collection: 1.180s, learning 0.062s)
+             Mean action noise std: 0.97
+          Mean value_function loss: 0.1189
+               Mean surrogate loss: -0.0130
+                 Mean entropy loss: 37.4734
+                       Mean reward: -2.19
+               Mean episode length: 23.82
+   Episode_Reward/track_lin_vel_xy: 0.0753
+              Episode_Reward/alive: 0.0081
+Episode_Reward/base_linear_velocity: -0.0101
+Episode_Reward/base_angular_velocity: -0.0084
+          Episode_Reward/joint_vel: -0.0119
+          Episode_Reward/joint_acc: -0.0125
+        Episode_Reward/action_rate: -0.1380
+     Episode_Reward/dof_pos_limits: -0.0021
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0153
+Episode_Reward/joint_deviation_arms: -0.0059
+Episode_Reward/joint_deviation_waists: -0.0040
+Episode_Reward/flat_orientation_l2: -0.0276
+        Episode_Reward/base_height: -0.0079
+               Episode_Reward/gait: 0.0232
+         Episode_Reward/feet_slide: -0.0071
+     Episode_Reward/feet_clearance: 0.0423
+ Episode_Reward/undesired_contacts: -0.0801
+         Curriculum/terrain_levels: 0.0009
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0878
+Metrics/base_velocity/error_vel_yaw: 0.1775
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1081344
+                    Iteration time: 1.24s
+                      Time elapsed: 00:00:14
+                               ETA: 00:00:14
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 80891 steps/s (collection: 1.148s, learning 0.067s)
+             Mean action noise std: 0.96
+          Mean value_function loss: 0.1100
+               Mean surrogate loss: -0.0097
+                 Mean entropy loss: 37.3821
+                       Mean reward: -2.10
+               Mean episode length: 23.76
+   Episode_Reward/track_lin_vel_xy: 0.0756
+              Episode_Reward/alive: 0.0081
+Episode_Reward/base_linear_velocity: -0.0099
+Episode_Reward/base_angular_velocity: -0.0083
+          Episode_Reward/joint_vel: -0.0119
+          Episode_Reward/joint_acc: -0.0119
+        Episode_Reward/action_rate: -0.1383
+     Episode_Reward/dof_pos_limits: -0.0021
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0151
+Episode_Reward/joint_deviation_arms: -0.0060
+Episode_Reward/joint_deviation_waists: -0.0040
+Episode_Reward/flat_orientation_l2: -0.0272
+        Episode_Reward/base_height: -0.0078
+               Episode_Reward/gait: 0.0231
+         Episode_Reward/feet_slide: -0.0073
+     Episode_Reward/feet_clearance: 0.0426
+ Episode_Reward/undesired_contacts: -0.0812
+         Curriculum/terrain_levels: 0.0007
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0882
+Metrics/base_velocity/error_vel_yaw: 0.1784
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1179648
+                    Iteration time: 1.22s
+                      Time elapsed: 00:00:15
+                               ETA: 00:00:15
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+[RMA:e_t] step=300 e_t stats over 4096 envs | force(mean/min/max)=25.147/0.006/49.994 N | leg_strength=1.000/0.900/1.100 | friction=1.000/1.000/1.000
+[RMA:e_t] sample env_ids=[0, 1] e_t[:2]=[[1.3283438e+01 1.0207025e+00 1.0955548e+00 9.6748602e-01 9.1204953e-01
+  9.0541536e-01 1.0491241e+00 1.0531900e+00 9.3777829e-01 9.7998351e-01
+  1.0774951e+00 9.0389884e-01 9.2833376e-01 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]
+ [2.7100519e+01 9.5150983e-01 9.5987999e-01 9.6527588e-01 9.3225116e-01
+  1.0421119e+00 9.5898890e-01 9.4802320e-01 9.5640963e-01 1.0926570e+00
+  1.0877105e+00 1.0345160e+00 1.0377710e+00 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]]
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 80282 steps/s (collection: 1.149s, learning 0.076s)
+             Mean action noise std: 0.96
+          Mean value_function loss: 0.1047
+               Mean surrogate loss: -0.0107
+                 Mean entropy loss: 37.2865
+                       Mean reward: -2.10
+               Mean episode length: 23.82
+   Episode_Reward/track_lin_vel_xy: 0.0739
+              Episode_Reward/alive: 0.0080
+Episode_Reward/base_linear_velocity: -0.0100
+Episode_Reward/base_angular_velocity: -0.0082
+          Episode_Reward/joint_vel: -0.0117
+          Episode_Reward/joint_acc: -0.0120
+        Episode_Reward/action_rate: -0.1341
+     Episode_Reward/dof_pos_limits: -0.0019
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0148
+Episode_Reward/joint_deviation_arms: -0.0058
+Episode_Reward/joint_deviation_waists: -0.0039
+Episode_Reward/flat_orientation_l2: -0.0273
+        Episode_Reward/base_height: -0.0078
+               Episode_Reward/gait: 0.0230
+         Episode_Reward/feet_slide: -0.0070
+     Episode_Reward/feet_clearance: 0.0416
+ Episode_Reward/undesired_contacts: -0.0789
+         Curriculum/terrain_levels: 0.0006
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0864
+Metrics/base_velocity/error_vel_yaw: 0.1746
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1277952
+                    Iteration time: 1.22s
+                      Time elapsed: 00:00:16
+                               ETA: 00:00:16
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 82565 steps/s (collection: 1.121s, learning 0.069s)
+             Mean action noise std: 0.96
+          Mean value_function loss: 0.0904
+               Mean surrogate loss: -0.0108
+                 Mean entropy loss: 37.1963
+                       Mean reward: -2.05
+               Mean episode length: 23.73
+   Episode_Reward/track_lin_vel_xy: 0.0758
+              Episode_Reward/alive: 0.0081
+Episode_Reward/base_linear_velocity: -0.0099
+Episode_Reward/base_angular_velocity: -0.0083
+          Episode_Reward/joint_vel: -0.0117
+          Episode_Reward/joint_acc: -0.0118
+        Episode_Reward/action_rate: -0.1340
+     Episode_Reward/dof_pos_limits: -0.0019
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0150
+Episode_Reward/joint_deviation_arms: -0.0059
+Episode_Reward/joint_deviation_waists: -0.0040
+Episode_Reward/flat_orientation_l2: -0.0271
+        Episode_Reward/base_height: -0.0077
+               Episode_Reward/gait: 0.0236
+         Episode_Reward/feet_slide: -0.0071
+     Episode_Reward/feet_clearance: 0.0421
+ Episode_Reward/undesired_contacts: -0.0802
+         Curriculum/terrain_levels: 0.0001
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0860
+Metrics/base_velocity/error_vel_yaw: 0.1759
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1376256
+                    Iteration time: 1.19s
+                      Time elapsed: 00:00:17
+                               ETA: 00:00:17
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 84677 steps/s (collection: 1.099s, learning 0.062s)
+             Mean action noise std: 0.95
+          Mean value_function loss: 0.0932
+               Mean surrogate loss: -0.0100
+                 Mean entropy loss: 37.0962
+                       Mean reward: -2.07
+               Mean episode length: 23.97
+   Episode_Reward/track_lin_vel_xy: 0.0776
+              Episode_Reward/alive: 0.0080
+Episode_Reward/base_linear_velocity: -0.0099
+Episode_Reward/base_angular_velocity: -0.0081
+          Episode_Reward/joint_vel: -0.0115
+          Episode_Reward/joint_acc: -0.0115
+        Episode_Reward/action_rate: -0.1311
+     Episode_Reward/dof_pos_limits: -0.0019
+             Episode_Reward/energy: -0.0013
+Episode_Reward/joint_deviation_legs: -0.0146
+Episode_Reward/joint_deviation_arms: -0.0058
+Episode_Reward/joint_deviation_waists: -0.0039
+Episode_Reward/flat_orientation_l2: -0.0271
+        Episode_Reward/base_height: -0.0077
+               Episode_Reward/gait: 0.0226
+         Episode_Reward/feet_slide: -0.0069
+     Episode_Reward/feet_clearance: 0.0415
+ Episode_Reward/undesired_contacts: -0.0787
+         Curriculum/terrain_levels: 0.0000
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0828
+Metrics/base_velocity/error_vel_yaw: 0.1730
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1474560
+                    Iteration time: 1.16s
+                      Time elapsed: 00:00:18
+                               ETA: 00:00:18
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+################################################################################
+                        [1m Learning iteration 0/1 [0m                        
+
+                       Computation: 89200 steps/s (collection: 1.040s, learning 0.062s)
+             Mean action noise std: 0.95
+          Mean value_function loss: 0.0878
+               Mean surrogate loss: -0.0073
+                 Mean entropy loss: 37.0172
+                       Mean reward: -2.04
+               Mean episode length: 23.71
+   Episode_Reward/track_lin_vel_xy: 0.0768
+              Episode_Reward/alive: 0.0079
+Episode_Reward/base_linear_velocity: -0.0097
+Episode_Reward/base_angular_velocity: -0.0081
+          Episode_Reward/joint_vel: -0.0113
+          Episode_Reward/joint_acc: -0.0116
+        Episode_Reward/action_rate: -0.1285
+     Episode_Reward/dof_pos_limits: -0.0019
+             Episode_Reward/energy: -0.0012
+Episode_Reward/joint_deviation_legs: -0.0146
+Episode_Reward/joint_deviation_arms: -0.0058
+Episode_Reward/joint_deviation_waists: -0.0038
+Episode_Reward/flat_orientation_l2: -0.0271
+        Episode_Reward/base_height: -0.0075
+               Episode_Reward/gait: 0.0226
+         Episode_Reward/feet_slide: -0.0068
+     Episode_Reward/feet_clearance: 0.0410
+ Episode_Reward/undesired_contacts: -0.0780
+         Curriculum/terrain_levels: 0.0000
+     Curriculum/lin_vel_cmd_levels: 1.0000
+Metrics/base_velocity/error_vel_xy: 0.0824
+Metrics/base_velocity/error_vel_yaw: 0.1700
+      Episode_Termination/time_out: 0.0000
+   Episode_Termination/base_height: 0.0000
+Episode_Termination/bad_orientation: 1.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1572864
+                    Iteration time: 1.10s
+                      Time elapsed: 00:00:20
+                               ETA: 00:00:20
+
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Found git repo at: /home/niraj/isaac_projects/unitree_h12_rma
+[store_code_state] History file already exists: /home/niraj/isaac_projects/unitree_h12_rma/rma_training/logs/rsl_rl/unitree_h12_walk_rma/2026-01-28_15-35-07/git/unitree_h12_rma_history.log
+[store_code_state] Generated 0 files: []
+[RMA:e_t] step=400 e_t stats over 4096 envs | force(mean/min/max)=24.943/0.007/49.990 N | leg_strength=1.000/0.900/1.100 | friction=1.000/1.000/1.000
+[RMA:e_t] sample env_ids=[0, 1] e_t[:2]=[[2.4493338e+01 9.9014997e-01 9.9572963e-01 1.0113668e+00 9.7677523e-01
+  9.5949936e-01 9.4970852e-01 1.0730693e+00 1.0102684e+00 9.6825665e-01
+  9.2793930e-01 9.3876320e-01 1.0996133e+00 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]
+ [2.5739182e+01 1.0876913e+00 9.3428004e-01 1.0214591e+00 9.5728683e-01
+  1.0521281e+00 9.2567408e-01 1.0727414e+00 1.0538361e+00 1.0655472e+00
+  1.0687269e+00 9.9519843e-01 9.8593324e-01 1.0000000e+00 7.5000001e-04
+  1.0000000e-01 5.0000001e-02]]
