@@ -55,12 +55,6 @@ parser.add_argument("--seed", type=int, default=None, help="Seed used for the en
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
 parser.add_argument("--encoder_weight", type=float, default=0.01, help="Weight for encoder loss in joint loss.")
 parser.add_argument("--decoder_weight", type=float, default=0.1, help="Weight for decoder loss in joint loss.")
-parser.add_argument(
-    "--friction_loss_weight",
-    type=float,
-    default=10.0,
-    help="Weight multiplier for friction reconstruction loss (dimension 13).",
-)
 parser.add_argument("--checkpoint_interval", type=int, default=100, help="Save encoder/decoder checkpoints every N iterations.")
 parser.add_argument(
     "--use_existing_kit_app",
@@ -138,8 +132,6 @@ from rma_modules import (
     EnvFactorDecoder,
     EnvFactorDecoderCfg,
 )
-from unitree_h12_sim2sim.tasks.manager_based.unitree_h12_sim2sim.mdp import rma as rma_mdp
-
 from agile.rl_env.rsl_rl import (  # isort: skip
     RslRlOnPolicyRunnerCfg,
     RslRlVecEnvWrapper,
@@ -152,18 +144,16 @@ torch.backends.cudnn.benchmark = False
 
 
 class EnvFactorNormalizer:
-    """Normalizes environment factors to [0, 1] range (force, leg_strength, friction only, 14 dims)."""
+    """Normalizes environment factors to [0, 1] range (force, leg_strength only, 13 dims)."""
     def __init__(self, device: str = "cpu"):
         self.device = device
         self.mins = torch.tensor([
             0.0,      # payload force
             *([0.9] * 12),  # leg strengths
-            0.0,      # friction
         ], device=device, dtype=torch.float32)
         self.maxs = torch.tensor([
             50.0,     # payload force
             *([1.1] * 12),  # leg strengths
-            1.0,      # friction
         ], device=device, dtype=torch.float32)
         self.ranges = self.maxs - self.mins
     def normalize(self, e_t: torch.Tensor) -> torch.Tensor:
@@ -180,7 +170,7 @@ class RmaEncoderObsWrapper(gym.Wrapper):
     """Phase-1 RMA: before each step, set rma_extrinsics_buf = encoder(normalize(e_t)) so the policy receives z_t."""
 
     RMA_Z_DIM = 8
-    RMA_ET_DIM = 14
+    RMA_ET_DIM = 13
 
     def __init__(self, env: gym.Env, encoder: "EnvFactorEncoder", normalizer: EnvFactorNormalizer, device: torch.device):
         super().__init__(env)
@@ -230,7 +220,6 @@ class RMATrainerJoint:
         device: str,
         encoder_weight: float = 0.01,
         decoder_weight: float = 0.1,
-        friction_loss_weight: float = 5.0,
         checkpoint_interval: int = 100,
     ):
         """Initialize trainer.
@@ -254,7 +243,6 @@ class RMATrainerJoint:
         
         self.encoder_weight = encoder_weight
         self.decoder_weight = decoder_weight
-        self.friction_loss_weight = friction_loss_weight
         self.checkpoint_interval = checkpoint_interval
         
         # Optimizers
@@ -286,43 +274,19 @@ class RMATrainerJoint:
     def extract_env_factors(self) -> torch.Tensor:
         """Extract environment factors from environment.
         Returns:
-            Tensor of shape (num_envs, 14), or None if unable to extract.
+            Tensor of shape (num_envs, 13), or None if unable to extract.
         """
         env = self._get_unwrapped_env()
         # Isaac Lab stores e_t in env.rma_env_factors_buf (populated by sample_rma_env_factors at reset)
         e_t = getattr(env, "rma_env_factors_buf", None)
-        if isinstance(e_t, torch.Tensor) and e_t.shape[0] > 0 and e_t.shape[-1] >= 14:
-            return e_t[:, :14].clone().to(self.device)
+        if isinstance(e_t, torch.Tensor) and e_t.shape[0] > 0 and e_t.shape[-1] >= 13:
+            return e_t[:, :13].clone().to(self.device)
         return None
-
-    def _get_friction_value(self) -> float | None:
-        """Best-effort read of current friction value (global)."""
-        env = self._get_unwrapped_env()
-        friction_val = getattr(env, "_rma_curriculum_friction", None)
-        if friction_val is not None:
-            return float(friction_val)
-
-        e_t = getattr(env, "rma_env_factors_buf", None)
-        if isinstance(e_t, torch.Tensor) and e_t.shape[0] > 0 and e_t.shape[-1] >= 14:
-            try:
-                friction = e_t[:, 13]
-                return float(friction.mean().item())
-            except Exception:
-                return None
-        return None
-
-    def _get_sim_friction_value(self) -> float | None:
-        """Best-effort read of terrain material friction (global)."""
-        env = self._get_unwrapped_env()
-        try:
-            return rma_mdp._read_ground_friction(env)
-        except Exception:
-            return None
     
     def train_step(self, e_t: torch.Tensor):
         """Perform one encoder/decoder training step.
         Args:
-            e_t: Environment factors from environment (num_envs, 14)
+            e_t: Environment factors from environment (num_envs, 13)
         """
         if e_t is None or e_t.numel() == 0:
             return
@@ -334,11 +298,8 @@ class RMATrainerJoint:
         z_t = self.encoder(e_t_normalized)
         e_t_recon = self.decoder(z_t, apply_scaling=False)
         
-        # Decoder loss (weighted reconstruction in normalized space)
-        # Up-weight friction (index 13) to discourage mean-collapse.
-        weights = torch.ones((1, e_t_recon.shape[1]), device=e_t_recon.device, dtype=e_t_recon.dtype)
-        weights[:, 13] = self.friction_loss_weight
-        decoder_loss = ((e_t_recon - e_t_normalized) ** 2 * weights).mean()
+        # Decoder loss (reconstruction in normalized space)
+        decoder_loss = torch.nn.functional.mse_loss(e_t_recon, e_t_normalized)
         
         # Total auxiliary loss (encoder aux loss removed)
         total_aux_loss = self.decoder_weight * decoder_loss
@@ -398,31 +359,15 @@ class RMATrainerJoint:
         avg_encoder_loss = sum(self.encoder_losses[-100:]) / min(100, len(self.encoder_losses))
         avg_decoder_loss = sum(self.decoder_losses[-100:]) / min(100, len(self.decoder_losses))
         
-        friction_val = self._get_friction_value()
-        sim_friction_val = self._get_sim_friction_value()
-        friction_msg = ""
-        if friction_val is not None:
-            friction_msg += f" | Friction: {friction_val:.3f}"
-        if sim_friction_val is not None:
-            friction_msg += f" | Sim friction: {sim_friction_val:.3f}"
-
         print(
             f"[Policy Iter {policy_iter:5d}] "
             f"Encoder Loss: {avg_encoder_loss:.6f} | "
             f"Decoder Loss: {avg_decoder_loss:.6f}"
-            f"{friction_msg}"
         )
         with self.loss_log_path.open("a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([policy_iter, avg_encoder_loss, avg_decoder_loss])
 
-        # TensorBoard logging for friction (if writer is enabled)
-        tb_writer = getattr(self.runner, "writer", None)
-        if tb_writer is not None:
-            if friction_val is not None:
-                tb_writer.add_scalar("rma/friction", friction_val, policy_iter)
-            if sim_friction_val is not None:
-                tb_writer.add_scalar("rma/friction_sim", sim_friction_val, policy_iter)
 
 
 @hydra_task_config(args_cli.task, "rsl_rl_cfg_entry_point")
@@ -478,9 +423,9 @@ def main(
 
     # Phase-1 RMA: encoder produces z_t from e_t; we feed z_t into policy obs via rma_extrinsics_buf.
     # Create encoder/decoder and wrapper *before* RSL-RL so each step populates z_t before policy sees obs.
-    encoder_cfg = EnvFactorEncoderCfg(in_dim=14, latent_dim=8, hidden_dims=(256, 128))
+    encoder_cfg = EnvFactorEncoderCfg(in_dim=13, latent_dim=8, hidden_dims=(256, 128))
     encoder = EnvFactorEncoder(cfg=encoder_cfg)
-    decoder_cfg = EnvFactorDecoderCfg(in_dim=8, out_dim=14, use_output_scaling=False)
+    decoder_cfg = EnvFactorDecoderCfg(in_dim=8, out_dim=13, use_output_scaling=False)
     decoder = EnvFactorDecoder(cfg=decoder_cfg)
     normalizer = EnvFactorNormalizer(device=agent_cfg.device)
     env = RmaEncoderObsWrapper(env, encoder, normalizer, agent_cfg.device)
@@ -512,7 +457,6 @@ def main(
         device=agent_cfg.device,
         encoder_weight=args_cli.encoder_weight,
         decoder_weight=args_cli.decoder_weight,
-        friction_loss_weight=args_cli.friction_loss_weight,
         checkpoint_interval=args_cli.checkpoint_interval,
     )
 

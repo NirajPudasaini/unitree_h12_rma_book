@@ -44,7 +44,7 @@ class EnvFactorDecoderCfg:
     """
     
     in_dim: int = 8  # Default: latent_dim from encoder
-    out_dim: int = 14  # e_t dimension (1 + 12 + 1)
+    out_dim: int = 13  # e_t dimension (1 + 12)
     hidden_dims: tuple[int, ...] = (256, 128)
     activation: str = "elu"
     use_output_scaling: bool = True  # Scale outputs to e_t ranges
@@ -52,10 +52,6 @@ class EnvFactorDecoderCfg:
     # Output ranges for each factor (used for post-processing)
     payload_range: tuple[float, float] = (0.0, 50.0)  # Force: 0-50 N
     leg_strength_range: tuple[float, float] = (0.9, 1.1)  # Strength: 0.9-1.1
-    friction_range: tuple[float, float] = (0.5, 2.0)  # Friction: reasonable range
-    terrain_amplitude_range: tuple[float, float] = (0.0, 0.01)  # Amplitude: 0-10mm
-    terrain_lengthscale_range: tuple[float, float] = (0.05, 0.2)  # Lengthscale: 5-20cm
-    terrain_noise_step_range: tuple[float, float] = (0.01, 0.1)  # Noise step: 1-10cm
 
 
 class EnvFactorDecoder(nn.Module):
@@ -87,15 +83,13 @@ class EnvFactorDecoder(nn.Module):
     
     def _register_output_ranges(self) -> None:
         """Register output ranges for post-processing."""
-        # e_t structure: [force(1), leg_strength(12), friction(1)]
+        # e_t structure: [force(1), leg_strength(12)]
         ranges = []
         # Payload force: 1 dim, range 0-50 N
         ranges.append(self.cfg.payload_range)
         # Leg strength: 12 dims, each 0.9-1.1
         for _ in range(12):
             ranges.append(self.cfg.leg_strength_range)
-        # Friction: 1 dim
-        ranges.append(self.cfg.friction_range)
         # Convert to tensor for batch processing
         ranges_tensor = torch.tensor(ranges, dtype=torch.float32)  # (out_dim, 2)
         self.register_buffer("_output_ranges", ranges_tensor)
@@ -108,7 +102,7 @@ class EnvFactorDecoder(nn.Module):
             apply_scaling: If True, scale outputs to valid e_t ranges
         
         Returns:
-            e_t: Tensor of shape (N, out_dim=17) with decoded environment factors
+            e_t: Tensor of shape (N, out_dim=13) with decoded environment factors
         """
         if latent.ndim != 2 or latent.shape[-1] != self.cfg.in_dim:
             raise ValueError(
@@ -177,11 +171,10 @@ class EnvFactorDecoder(nn.Module):
             latent: Latent encoding (N, in_dim)
             apply_scaling: Whether to apply output scaling
         Returns:
-            Dictionary with keys: 'payload_force', 'leg_strength', 'friction'
+            Dictionary with keys: 'payload_force', 'leg_strength'
         """
         e_t = self.forward(latent, apply_scaling=apply_scaling)
         return {
             "payload_force": e_t[:, 0:1],  # (N, 1)
             "leg_strength": e_t[:, 1:13],  # (N, 12)
-            "friction": e_t[:, 13:14],  # (N, 1)
         }

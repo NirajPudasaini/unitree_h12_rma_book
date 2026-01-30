@@ -28,7 +28,7 @@ def _build_mlp(in_dim: int, hidden_dims: list[int], out_dim: int, activation: st
 
 @dataclass
 class EnvFactorEncoderCfg:
-    in_dim: int = 19
+    in_dim: int = 13
     latent_dim: int = 8
     hidden_dims: tuple[int, ...] = (256, 128)
     activation: str = "elu"

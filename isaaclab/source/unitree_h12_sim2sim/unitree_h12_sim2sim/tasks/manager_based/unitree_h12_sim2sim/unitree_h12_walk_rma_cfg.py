@@ -33,7 +33,7 @@ from rma_modules.env_factor_spec import DEFAULT_ET_SPEC
 
 
 RMA_Z_DIM = 8
-# e_t now only includes: force, leg_strength, friction (no terrain)
+# e_t now only includes: force, leg_strength (no terrain)
 RMA_ET_DIM = DEFAULT_ET_SPEC.dim
 
 
@@ -41,7 +41,7 @@ RMA_ET_DIM = DEFAULT_ET_SPEC.dim
 # Reformulated for base policy and RMA encoder/decoder training (no terrain in e_t)
 @configclass
 class ObservationsRmaCfg(_BaseObservationsCfg):
-    """Observation specification for RMA: extrinsics (z_t) and reduced env factors (e_t: force, leg_strength, friction)."""
+    """Observation specification for RMA: extrinsics (z_t) and reduced env factors (e_t: force, leg_strength)."""
 
     @configclass
     class PolicyCfg(_BaseObservationsCfg.PolicyCfg):
@@ -61,7 +61,7 @@ class ObservationsRmaCfg(_BaseObservationsCfg):
     class CriticCfg(_BaseObservationsCfg.CriticCfg):
         """Observations for critic group (privileged, for RMA phase-1 or logging)."""
 
-        # Privileged environment factors (e_t): force, leg_strength, friction only.
+        # Privileged environment factors (e_t): force, leg_strength only.
         rma_env_factors = ObsTerm(func=mdp.rma_env_factors, params={"dim": RMA_ET_DIM})
         # Slip-related cue: tangential foot velocity during contact (privileged).
         feet_slip_velocity = ObsTerm(
@@ -87,21 +87,6 @@ class CurriculumRmaCfg:
 
     terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
     lin_vel_cmd_levels = CurrTerm(mdp.lin_vel_cmd_levels)
-    friction_levels = CurrTerm(
-        func=mdp.rma_friction_levels,
-        params={
-            "friction_range": (0.5, 1.0),
-            "num_buckets": 8,
-            "reward_term_name": "track_lin_vel_xy",
-            "min_progress": 0.2,
-            "max_progress": 0.8,
-            "advance_every_episodes": 10,
-            "advance_every_steps": 500,
-            "cycle": True,
-        },
-    )
-
-
 @configclass
 class H12LocomotionFullBodyRmaEnvCfg(H12LocomotionFullBodyEnvCfg):
     """Configuration for H12 full-body locomotion task with RMA observation extensions."""

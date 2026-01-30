@@ -43,14 +43,12 @@ def _get_or_create_env_buffer(env: ManagerBasedRLEnv, attr_name: str, dim: int) 
 
 
 def rma_env_factors(env: ManagerBasedRLEnv, dim: int = DEFAULT_ET_SPEC.dim) -> torch.Tensor:
-    """Privileged environment factors e_t (simulation-only, 18 dims for Unitree-H12).
+    """Privileged environment factors e_t (simulation-only, 13 dims for Unitree-H12).
 
     Default intended ordering:
     [
        payload_downward_force_N (1D),
        leg_strength_scale (12D: multiplicative scale on effort limits for each leg joint, range 0.9–1.1),
-       ground_friction_coeff (1D),
-       terrain_params (4D: amplitude_m, lengthscale_m, noise_step_m, friction_coeff)
     ]
 
     This function currently returns a per-env buffer that can be populated by RMA event terms (sample_rma_env_factors).

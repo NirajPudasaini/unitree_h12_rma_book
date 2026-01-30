@@ -57,72 +57,12 @@ def _read_leg_effort_limits(
         return None, None
 
 
-def _read_ground_friction(env: ManagerBasedRLEnv) -> float | None:
-    try:
-        # Try to access terrain
-        terrain = getattr(env.scene, "terrain", None)
-        if terrain is None:
-            terrain = env.scene["terrain"]
-        
-        # Search for physics material in common locations
-        for obj in (getattr(terrain, "cfg", None), terrain, getattr(terrain, "physics_material", None)):
-            if obj is None:
-                continue
-            
-            mat = getattr(obj, "physics_material", None)
-            if mat is None:
-                mat = obj if hasattr(obj, "static_friction") and hasattr(obj, "dynamic_friction") else None
-            if mat is None:
-                continue
-            
-            return float(getattr(mat, "static_friction"))
-    except Exception:
-        pass
-    
-    return None
-
-
-def _apply_ground_friction(env: ManagerBasedRLEnv, friction_val: float) -> None:
-    """Apply a single friction value to the terrain physics material (global)."""
-    try:
-        terrain = getattr(env.scene, "terrain", None)
-        if terrain is None:
-            terrain = env.scene["terrain"]
-
-        # Search for physics material in common locations
-        for obj in (getattr(terrain, "cfg", None), terrain, getattr(terrain, "physics_material", None)):
-            if obj is None:
-                continue
-
-            mat = getattr(obj, "physics_material", None)
-            if mat is None and hasattr(obj, "static_friction") and hasattr(obj, "dynamic_friction"):
-                mat = obj
-            if mat is None:
-                continue
-
-            # Set both static and dynamic friction
-            if hasattr(mat, "static_friction"):
-                setattr(mat, "static_friction", float(friction_val))
-            if hasattr(mat, "dynamic_friction"):
-                setattr(mat, "dynamic_friction", float(friction_val))
-            return
-    except Exception:
-        pass
-
-
-
 def _maybe_cache_baselines(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg, env_ids: torch.Tensor) -> None:
     if not hasattr(env, "_rma_baseline_effort_limits"):
         limits, joint_ids = _read_leg_effort_limits(env, asset_cfg, env_ids, LEG_JOINT_NAMES)
         if limits is not None and joint_ids is not None:
             env._rma_baseline_effort_limits = limits.clone()
             env._rma_baseline_effort_joint_ids = joint_ids
-
-    if not hasattr(env, "_rma_baseline_friction"):
-        mu = _read_ground_friction(env)
-        if mu is not None:
-            env._rma_baseline_friction = mu
-
 
 def sample_payload_force(
     env_ids: torch.Tensor,
@@ -258,15 +198,13 @@ def sample_rma_env_factors(
     *,
     payload_force_range_n: tuple[float, float] = (0.0, 50.0),
     leg_strength_range: tuple[float, float] = (0.9, 1.1),
-    friction_range: tuple[float, float] = (0.5, 1.0),
     apply_to_sim: bool = True,
 ) -> None:
-    """Sample + store + apply e_t (14D: force + leg_strength + friction).
+    """Sample + store + apply e_t (13D: force + leg_strength).
 
     Active factors (sampled & applied):
         - e_t[0] (1D): downward force in Newtons → applied as external wrench
         - e_t[1:13] (12D): leg joint strength scales → applied as torque limit scaling
-        - e_t[13] (1D): ground friction coefficient (sampled, observed by encoder)
 
     Args:
         env_ids: environments being reset.
@@ -279,28 +217,14 @@ def sample_rma_env_factors(
 
     et = _ensure_buffer(env, "rma_env_factors_buf", DEFAULT_ET_SPEC.dim)
 
-    # --- sample active factors (e_t = force + leg_strength + friction, 14D per RmaEtSpec)
+    # --- sample active factors (e_t = force + leg_strength, 13D per RmaEtSpec)
     payload_force = sample_payload_force(env_ids, device, payload_force_range_n)
     leg_strength = sample_leg_strength_scale(env_ids, device, DEFAULT_ET_SPEC.leg_strength_dim, leg_strength_range)
 
-    # --- sample friction globally (single value for all envs)
-    friction_val = getattr(env, "_rma_curriculum_friction", None)
-    if friction_val is None:
-        levels = getattr(env, "_rma_friction_levels", None)
-        if levels is not None and len(levels) > 0:
-            friction_val = float(levels[0].item())
-        else:
-            mu_min, mu_max = float(friction_range[0]), float(friction_range[1])
-            friction_val = torch.empty((1,), device=device).uniform_(mu_min, mu_max).item()
-    else:
-        friction_val = float(friction_val)
-    friction = torch.full((env_ids.numel(),), friction_val, device=device)
-
-    # --- pack e_t buffer (14D: payload, leg_strength, friction)
+    # --- pack e_t buffer (13D: payload, leg_strength)
     et_env = et[env_ids]
     et_env[:, DEFAULT_ET_SPEC.payload_slice] = payload_force.unsqueeze(-1)
     et_env[:, DEFAULT_ET_SPEC.leg_strength_slice] = leg_strength
-    et_env[:, DEFAULT_ET_SPEC.friction_slice] = friction.unsqueeze(-1)
     et[env_ids] = et_env
 
     # Cache baselines before any modifications
@@ -311,8 +235,6 @@ def sample_rma_env_factors(
     if apply_to_sim:
         _apply_downward_force(env, asset_cfg, env_ids, payload_force)
         _set_leg_effort_limits(env, asset_cfg, env_ids, leg_strength, LEG_JOINT_NAMES)
-        # Terrain friction is global; apply the sampled value
-        _apply_ground_friction(env, float(friction_val))
 
     # Store for debugging
     env.rma_payload_force_n = payload_force

@@ -145,18 +145,16 @@ torch.backends.cudnn.benchmark = False
 
 
 class EnvFactorNormalizer:
-    """Normalizes environment factors to [0, 1] range (force, leg_strength, friction only, 14 dims)."""
+    """Normalizes environment factors to [0, 1] range (force, leg_strength only, 13 dims)."""
     def __init__(self, device: str = "cpu"):
         self.device = device
         self.mins = torch.tensor([
             0.0,      # payload force
             *([0.9] * 12),  # leg strengths
-            0.0,      # friction
         ], device=device, dtype=torch.float32)
         self.maxs = torch.tensor([
             50.0,     # payload force
             *([1.1] * 12),  # leg strengths
-            1.0,      # friction
         ], device=device, dtype=torch.float32)
         self.ranges = self.maxs - self.mins
     def normalize(self, e_t: torch.Tensor) -> torch.Tensor:
@@ -173,7 +171,7 @@ class RmaEncoderObsWrapper(gym.Wrapper):
     """Phase-1 RMA: before each step, set rma_extrinsics_buf = encoder(normalize(e_t)) so the policy receives z_t."""
 
     RMA_Z_DIM = 8
-    RMA_ET_DIM = 14
+    RMA_ET_DIM = 13
 
     def __init__(self, env: gym.Env, encoder: "EnvFactorEncoder", normalizer: EnvFactorNormalizer, device: torch.device):
         super().__init__(env)
@@ -277,35 +275,19 @@ class RMATrainerJoint:
     def extract_env_factors(self) -> torch.Tensor:
         """Extract environment factors from environment.
         Returns:
-            Tensor of shape (num_envs, 14), or None if unable to extract.
+            Tensor of shape (num_envs, 13), or None if unable to extract.
         """
         env = self._get_unwrapped_env()
         # Isaac Lab stores e_t in env.rma_env_factors_buf (populated by sample_rma_env_factors at reset)
         e_t = getattr(env, "rma_env_factors_buf", None)
-        if isinstance(e_t, torch.Tensor) and e_t.shape[0] > 0 and e_t.shape[-1] >= 14:
-            return e_t[:, :14].clone().to(self.device)
-        return None
-
-    def _get_friction_value(self) -> float | None:
-        """Best-effort read of current friction value (global)."""
-        env = self._get_unwrapped_env()
-        friction_val = getattr(env, "_rma_curriculum_friction", None)
-        if friction_val is not None:
-            return float(friction_val)
-
-        e_t = getattr(env, "rma_env_factors_buf", None)
-        if isinstance(e_t, torch.Tensor) and e_t.shape[0] > 0 and e_t.shape[-1] >= 14:
-            try:
-                friction = e_t[:, 13]
-                return float(friction.mean().item())
-            except Exception:
-                return None
+        if isinstance(e_t, torch.Tensor) and e_t.shape[0] > 0 and e_t.shape[-1] >= 13:
+            return e_t[:, :13].clone().to(self.device)
         return None
     
     def train_step(self, e_t: torch.Tensor):
         """Perform one encoder/decoder training step.
         Args:
-            e_t: Environment factors from environment (num_envs, 14)
+            e_t: Environment factors from environment (num_envs, 13)
         """
         if e_t is None or e_t.numel() == 0:
             return
@@ -393,12 +375,6 @@ class RMATrainerJoint:
             writer = csv.writer(f)
             writer.writerow([policy_iter, avg_encoder_loss, avg_decoder_loss])
 
-        # TensorBoard logging for friction (if writer is enabled)
-        friction_val = self._get_friction_value()
-        if friction_val is not None:
-            tb_writer = getattr(self.runner, "writer", None)
-            if tb_writer is not None:
-                tb_writer.add_scalar("rma/friction", friction_val, policy_iter)
 
 
 @hydra_task_config(args_cli.task, "rsl_rl_cfg_entry_point")
@@ -454,9 +430,9 @@ def main(
 
     # Phase-1 RMA: encoder produces z_t from e_t; we feed z_t into policy obs via rma_extrinsics_buf.
     # Create encoder/decoder and wrapper *before* RSL-RL so each step populates z_t before policy sees obs.
-    encoder_cfg = EnvFactorEncoderCfg(in_dim=14, latent_dim=8, hidden_dims=(256, 128))
+    encoder_cfg = EnvFactorEncoderCfg(in_dim=13, latent_dim=8, hidden_dims=(256, 128))
     encoder = EnvFactorEncoder(cfg=encoder_cfg)
-    decoder_cfg = EnvFactorDecoderCfg(in_dim=8, out_dim=14, use_output_scaling=False)
+    decoder_cfg = EnvFactorDecoderCfg(in_dim=8, out_dim=13, use_output_scaling=False)
     decoder = EnvFactorDecoder(cfg=decoder_cfg)
     normalizer = EnvFactorNormalizer(device=agent_cfg.device)
     env = RmaEncoderObsWrapper(env, encoder, normalizer, agent_cfg.device)
@@ -480,7 +456,7 @@ def main(
         runner.load(resume_path, load_optimizer=agent_cfg.load_optimizer)
 
     # Create encoder and decoder
-    encoder_cfg = EnvFactorEncoderCfg(in_dim=14, latent_dim=8, hidden_dims=(256, 128))
+    encoder_cfg = EnvFactorEncoderCfg(in_dim=13, latent_dim=8, hidden_dims=(256, 128))
     encoder = EnvFactorEncoder(cfg=encoder_cfg)
 
     decoder_cfg = EnvFactorDecoderCfg()

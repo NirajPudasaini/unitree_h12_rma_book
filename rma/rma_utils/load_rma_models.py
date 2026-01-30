@@ -32,7 +32,7 @@ def load_encoder(checkpoint_path: str, device: str = "cuda") -> tuple[EnvFactorE
     checkpoint = torch.load(checkpoint_path, map_location=device)
     
     # Create encoder with default config
-    encoder_cfg = EnvFactorEncoderCfg(in_dim=17, latent_dim=8, hidden_dims=(256, 128))
+    encoder_cfg = EnvFactorEncoderCfg(in_dim=13, latent_dim=8, hidden_dims=(256, 128))
     encoder = EnvFactorEncoder(cfg=encoder_cfg)
     
     # Load weights
@@ -85,13 +85,11 @@ def test_encoder_decoder(encoder: EnvFactorEncoder, decoder: EnvFactorDecoder, d
     
     # Create random environment factors
     batch_size = 4
-    e_t = torch.randn(batch_size, 17, device=device)
+    e_t = torch.randn(batch_size, 13, device=device)
     
     print(f"Input e_t shape: {e_t.shape}")
     print(f"  - Payload force [0]: {e_t[:, 0].mean().item():.4f} +/- {e_t[:, 0].std().item():.4f}")
     print(f"  - Leg strength [1:13] mean: {e_t[:, 1:13].mean().item():.4f}")
-    print(f"  - Friction [13]: {e_t[:, 13].mean().item():.4f}")
-    print(f"  - Terrain [14:17] mean: {e_t[:, 14:17].mean().item():.4f}")
     
     # Encode
     with torch.no_grad():
@@ -117,10 +115,6 @@ def test_encoder_decoder(encoder: EnvFactorEncoder, decoder: EnvFactorDecoder, d
     factor_names = [
         "Payload Force",
         *[f"Leg Strength {i}" for i in range(12)],
-        "Friction",
-        "Terrain Amplitude",
-        "Terrain Lengthscale",
-        "Terrain Noise Step",
     ]
     
     for i, (name, mse) in enumerate(zip(factor_names, per_factor_mse)):
