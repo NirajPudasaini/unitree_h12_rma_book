@@ -335,26 +335,6 @@ def main():
         )
     
     print("\n" + "="*100)
-    
-    # Interpretation
-    print("\nInterpretation Guide:")
-    print("  MSE < 0.001: Excellent reconstruction (< 0.1% error)")
-    print("  MSE < 0.01:  Good reconstruction (< 1% error)")
-    print("  MSE < 0.1:   Acceptable reconstruction (< 10% error)")
-    print("  MSE > 0.1:   Poor reconstruction (> 10% error)")
-    
-    # Quality assessment
-    print("\nQuality Assessment:")
-    if stats['total_mse'] < 0.001:
-        print("  ✅ EXCELLENT: Decoder provides excellent reconstruction")
-    elif stats['total_mse'] < 0.01:
-        print("  ✅ GOOD: Decoder provides good reconstruction")
-    elif stats['total_mse'] < 0.1:
-        print("  ⚠️  ACCEPTABLE: Decoder reconstruction is acceptable but could improve")
-    else:
-        print("  ❌ POOR: Decoder reconstruction needs improvement")
-    
-    print("\n" + "="*100)
 
 
 if __name__ == "__main__":
