@@ -20,6 +20,16 @@
 # flake8: noqa
 
 import argparse
+import sys
+from pathlib import Path
+
+# Add IsaacLab + local extensions to PYTHONPATH
+workspace_root = Path(__file__).resolve().parents[1]
+isaaclab_root = Path("/home/niraj/isaac_projects/IsaacLab")
+sys.path.insert(0, str(isaaclab_root / "source"))
+sys.path.insert(0, str(workspace_root / "isaaclab" / "source"))
+sys.path.insert(0, str(workspace_root / "rma"))
+sys.path.insert(0, str(workspace_root / "isaaclab" / "scripts" / "rsl_rl"))
 
 from isaaclab.app import AppLauncher
 
@@ -147,6 +157,9 @@ if args_cli.video:
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
+
+# Ensure environment registration is executed after SimulationApp starts
+import unitree_h12_sim2sim.tasks.manager_based.unitree_h12_sim2sim  # noqa: F401
 
 """Rest everything follows."""
 
@@ -430,12 +443,24 @@ def main():
         metrics_path = os.path.dirname(args_cli.metrics_file)
         os.makedirs(metrics_path, exist_ok=True)
 
+    evaluator = None
     if args_cli.run_evaluation:
-        print("[INFO] Running default motion metrics evaluator.")
-        if args_cli.save_trajectories and args_cli.trajectory_fields:
-            print(f"[INFO] Saving fields: {args_cli.trajectory_fields}")
+        # Validate that an 'eval' observation group exists
+        obs_manager = getattr(env.unwrapped, "observation_manager", None)
+        active_groups = getattr(obs_manager, "active_terms", {}) if obs_manager is not None else {}
+        if "eval" not in active_groups:
+            print(
+                "[WARNING] Skipping PolicyEvaluator: missing 'eval' observation group. "
+                "Available groups: "
+                f"{list(active_groups.keys())}"
+            )
+            args_cli.run_evaluation = False
         else:
-            print("[INFO] Saving all trajectory fields.")
+            print("[INFO] Running default motion metrics evaluator.")
+            if args_cli.save_trajectories and args_cli.trajectory_fields:
+                print(f"[INFO] Saving fields: {args_cli.trajectory_fields}")
+            else:
+                print("[INFO] Saving all trajectory fields.")
 
         # Extract joint group config if available
         joint_group_config = None
@@ -456,16 +481,17 @@ def main():
             total_episodes = args_cli.num_envs
             print(f"[INFO] Will collect {total_episodes} episodes")
 
-        evaluator = PolicyEvaluator(
-            env,
-            task_name=args_cli.task,
-            metrics_path=metrics_path,
-            total_envs_target=total_episodes,
-            verbose=True,
-            save_trajectories=args_cli.save_trajectories,
-            trajectory_fields=args_cli.trajectory_fields,
-            joint_group_config=joint_group_config,
-        )
+        if args_cli.run_evaluation:
+            evaluator = PolicyEvaluator(
+                env,
+                task_name=args_cli.task,
+                metrics_path=metrics_path,
+                total_envs_target=total_episodes,
+                verbose=True,
+                save_trajectories=args_cli.save_trajectories,
+                trajectory_fields=args_cli.trajectory_fields,
+                joint_group_config=joint_group_config,
+            )
 
     env.reset()
     # Reset scheduler after burn-in if using scenarios
@@ -613,7 +639,7 @@ def main():
 
         num_steps += 1
 
-        if args_cli.run_evaluation:
+        if args_cli.run_evaluation and evaluator is not None:
             # Update the evaluator with corrected extras that contain the right commands
             done = evaluator.collect(dones, extras)
             if done:
@@ -621,7 +647,7 @@ def main():
 
     # Finalize evaluation if it was running
     # This is called whether the loop completed normally or was interrupted
-    if args_cli.run_evaluation:
+    if args_cli.run_evaluation and evaluator is not None:
         # Check if evaluation completed
         if evaluator._num_envs_evaluated < evaluator._total_envs_target:
             print(

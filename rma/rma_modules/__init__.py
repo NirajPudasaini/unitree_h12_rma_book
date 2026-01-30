@@ -10,7 +10,7 @@ Phase 2 (adaptation):
 
 from .env_factor_encoder import EnvFactorEncoder, EnvFactorEncoderCfg
 from .env_factor_decoder import EnvFactorDecoder, EnvFactorDecoderCfg
-from .adaptation_module import AdaptationModule
+from .adaptation_module import AdaptationModule, AdaptationModuleCfg
 from .env_factor_spec import DEFAULT_ET_SPEC, RmaEtSpec
 
 __all__ = [
@@ -19,6 +19,7 @@ __all__ = [
     "EnvFactorDecoder",
     "EnvFactorDecoderCfg",
     "AdaptationModule",
+    "AdaptationModuleCfg",
     "RmaEtSpec",
     "DEFAULT_ET_SPEC",
 ]

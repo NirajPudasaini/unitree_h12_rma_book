@@ -49,33 +49,21 @@ TERRAIN_ROUGH_PROPORTION = 0.7
 TERRAIN_NOISE_RANGE = (0.05, 0.25)
 TERRAIN_NOISE_STEP = 0.05
 
-ROUGH_TERRAINS_CFG = terrain_gen.TerrainGeneratorCfg(
+COBBLESTONE_ROAD_CFG = terrain_gen.TerrainGeneratorCfg(
     size=(8.0, 8.0),
     border_width=20.0,
-    num_rows=10,
-    num_cols=20,
+    num_rows=9,
+    num_cols=21,
     horizontal_scale=0.1,
     vertical_scale=0.005,
     slope_threshold=0.75,
     difficulty_range=(0.0, 1.0),
     use_cache=False,
     sub_terrains={
-        # Flat terrain (zero-height noise)
-        "flat": terrain_gen.HfRandomUniformTerrainCfg(
-            proportion=TERRAIN_FLAT_PROPORTION,
-            noise_range=(0.0, 0.0),
-            noise_step=TERRAIN_NOISE_STEP,
-            border_width=0.25,
-        ),
-        # Bumps-only terrain (random rough heightfield)
-        "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
-            proportion=TERRAIN_ROUGH_PROPORTION,
-            noise_range=TERRAIN_NOISE_RANGE,
-            noise_step=TERRAIN_NOISE_STEP,
-            border_width=0.25,
-        ),
+        "flat": terrain_gen.MeshPlaneTerrainCfg(proportion=0.5),
     },
 )
+
 
 ##############################################################
 
@@ -91,7 +79,7 @@ class H12LocomotionSceneCfg(InteractiveSceneCfg):
     terrain = TerrainImporterCfg(
         prim_path="/World/ground",
         terrain_type="generator",  # "plane", "generator"
-        terrain_generator=ROUGH_TERRAINS_CFG,
+        terrain_generator=COBBLESTONE_ROAD_CFG,
         max_init_terrain_level=0,
         collision_group=-1,
         physics_material=sim_utils.RigidBodyMaterialCfg(
