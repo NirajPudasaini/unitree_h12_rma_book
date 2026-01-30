@@ -250,7 +250,7 @@ def main():
     if not encoder_path or not decoder_path:
         # Try to find automatically
         print("[INFO] Searching for latest training run...")
-        log_root = Path("/home/niraj/isaac_projects/unitree_h12_rma/rma/logs/rsl_rl/unitree_h12_walk_rma")
+        log_root = Path(__file__).resolve().parents[1] / "logs" / "rsl_rl" / "unitree_h12_walk_rma"
         if log_root.exists():
             runs = sorted(log_root.glob("2026-*"))
             if runs:
