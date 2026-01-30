@@ -21,6 +21,15 @@ sys.path.insert(0, str(workspace_root / "isaaclab" / "source"))
 sys.path.insert(0, str(workspace_root / "rma"))
 sys.path.insert(0, str(workspace_root / "isaaclab" / "scripts" / "rsl_rl"))
 
+# Ensure we don't accidentally import from the old repo copy
+sys.path = [p for p in sys.path if "unitree_h12_rma/" not in p]
+
+# Purge any already-loaded modules from the old repo
+for name, mod in list(sys.modules.items()):
+    mod_file = getattr(mod, "__file__", "") or ""
+    if "unitree_h12_rma/" in mod_file:
+        del sys.modules[name]
+
 # NOTE: Do not import any Isaac Sim/Omni modules before SimulationApp starts.
 from isaaclab.app import AppLauncher
 

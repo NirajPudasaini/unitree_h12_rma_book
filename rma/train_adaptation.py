@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import sys
@@ -135,7 +136,23 @@ def _save_metadata(output_dir: Path, meta: dict) -> None:
 
 
 def collect_dataset(args) -> Path:
-    """Collect (history -> z_t) dataset for adaptation."""
+    """Collect (history -> z_t) dataset for adaptation.
+    
+    IMPORTANT: We store only PROPRIOCEPTIVE observations (excluding z_t/rma_extrinsics)
+    in the history buffer. The adaptation module should predict z_t from proprioception
+    alone, not from observations that already contain z_t.
+    
+    Observation structure (490 dims total, with 5-frame history stacking):
+    - base_ang_vel:       15 (3 × 5)
+    - projected_gravity:  15 (3 × 5)
+    - velocity_commands:  15 (3 × 5)
+    - joint_pos_rel:     135 (27 × 5)
+    - joint_vel_rel:     135 (27 × 5)
+    - last_action:       135 (27 × 5)
+    - rma_extrinsics:     40 (8 × 5)  ← EXCLUDED from history
+    
+    Proprioceptive obs = obs[:, :-40] = 450 dims
+    """
     # NOTE: Do not import any Isaac Sim/Omni modules before SimulationApp starts.
     from isaaclab_tasks.utils.parse_cfg import load_cfg_from_registry
     import gymnasium as gym
@@ -163,7 +180,7 @@ def collect_dataset(args) -> Path:
     policy, _ppo_runner = _load_policy(str(policy_checkpoint), env, agent_cfg)
 
     encoder_ckpt_path = _resolve_encoder_checkpoint(policy_checkpoint, args.encoder_checkpoint)
-    encoder_cfg = EnvFactorEncoderCfg(in_dim=13, latent_dim=8, hidden_dims=(256, 128))
+    encoder_cfg = EnvFactorEncoderCfg(in_dim=13, latent_dim=args.latent_dim, hidden_dims=(256, 128))
     encoder = EnvFactorEncoder(cfg=encoder_cfg).to(args.device)
     encoder_ckpt = torch.load(encoder_ckpt_path, map_location=args.device)
     encoder.load_state_dict(encoder_ckpt["model_state_dict"])
@@ -173,13 +190,29 @@ def collect_dataset(args) -> Path:
 
     # Reset env
     obs = _maybe_tuple_obs(env.reset())
-    obs_dim = obs.shape[-1]
-    act_dim = env.unwrapped.action_space.shape[0]
+    full_obs_dim = obs.shape[-1]  # 490 (includes z_t)
+    act_dim = env.unwrapped.action_space.shape[0]  # 27
     num_envs = env.unwrapped.num_envs
-    hist_dim = (obs_dim + act_dim) * args.history_len
+    
+    # Exclude rma_extrinsics (z_t) from history - last 40 dims (8 × 5 history frames)
+    z_t_stacked_dim = args.latent_dim * 5  # 8 * 5 = 40
+    proprio_dim = full_obs_dim - z_t_stacked_dim  # 490 - 40 = 450
+    
+    # History dimension: proprioceptive obs + action per timestep
+    hist_entry_dim = proprio_dim + act_dim  # 450 + 27 = 477
+    hist_dim = hist_entry_dim * args.history_len  # 477 * H
+    
+    print(f"[INFO] Observation structure:")
+    print(f"       Full obs dim:      {full_obs_dim}")
+    print(f"       z_t stacked dim:   {z_t_stacked_dim} (excluded from history)")
+    print(f"       Proprio dim:       {proprio_dim}")
+    print(f"       Action dim:        {act_dim}")
+    print(f"       History entry dim: {hist_entry_dim}")
+    print(f"       History length:    {args.history_len}")
+    print(f"       Total hist dim:    {hist_dim}")
 
     history = torch.zeros(
-        (num_envs, args.history_len, obs_dim + act_dim),
+        (num_envs, args.history_len, hist_entry_dim),
         device=env.unwrapped.device,
         dtype=torch.float32,
     )
@@ -190,7 +223,7 @@ def collect_dataset(args) -> Path:
         adapt_cfg = AdaptationModuleCfg(
             in_dim=hist_dim,
             latent_dim=args.latent_dim,
-            hidden_dims=(256, 128),
+            hidden_dims=(256, 256, 128),  # Slightly deeper for larger input
             activation="elu",
         )
         adapt_module = AdaptationModule(cfg=adapt_cfg).to(args.device)
@@ -206,9 +239,13 @@ def collect_dataset(args) -> Path:
     meta = {
         "task": args.task,
         "history_len": args.history_len,
-        "obs_dim": obs_dim,
+        "full_obs_dim": full_obs_dim,
+        "proprio_dim": proprio_dim,
+        "z_t_stacked_dim": z_t_stacked_dim,
         "act_dim": act_dim,
+        "hist_entry_dim": hist_entry_dim,
         "hist_dim": hist_dim,
+        "latent_dim": args.latent_dim,
         "num_envs": num_envs,
         "num_steps": args.num_steps,
         "policy_checkpoint": str(policy_checkpoint),
@@ -234,13 +271,14 @@ def collect_dataset(args) -> Path:
             else:
                 z_t_teacher = None
 
-            # Write extrinsics for rollout
+            # Write extrinsics for rollout (policy still needs z_t in observation)
             if args.rollout_extrinsics == "encoder" and z_t_teacher is not None:
                 _write_extrinsics(env, z_t_teacher)
             elif args.rollout_extrinsics == "adaptation" and adapt_module is not None and step >= args.history_len - 1:
                 hist_flat = history.reshape(num_envs, -1).to(args.device)
-                z_hat = adapt_module(hist_flat)
-                _write_extrinsics(env, z_hat)
+                with torch.enable_grad():
+                    z_hat = adapt_module(hist_flat)
+                _write_extrinsics(env, z_hat.detach())
             elif args.rollout_extrinsics == "zero":
                 _write_extrinsics(env, torch.zeros((num_envs, args.latent_dim), device=env.unwrapped.device))
 
@@ -248,8 +286,13 @@ def collect_dataset(args) -> Path:
             next_obs, _reward, done, _info = _step_env(env, action)
             next_obs = _maybe_tuple_obs(next_obs)
 
+            # Extract proprioceptive observation (EXCLUDE z_t from history)
+            # obs structure: [proprio (450 dims), z_t_stacked (40 dims)]
+            proprio_obs = obs[:, :-z_t_stacked_dim]  # Remove z_t from end
+            
+            # Roll history and insert new (proprio_obs, action) pair
             history = torch.roll(history, shifts=-1, dims=1)
-            history[:, -1, :] = torch.cat([obs, action], dim=-1)
+            history[:, -1, :] = torch.cat([proprio_obs, action], dim=-1)
 
             # Clear history for reset environments
             if done is not None:
@@ -267,17 +310,22 @@ def collect_dataset(args) -> Path:
 
                 # Optional online update of adaptation module
                 if args.rollout_extrinsics == "adaptation" and args.online_update and adapt_module is not None:
-                    adapt_optimizer.zero_grad(set_to_none=True)
-                    pred = adapt_module(history.reshape(num_envs, -1).to(args.device))
-                    loss = torch.nn.functional.mse_loss(pred, z_t_teacher.detach())
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(adapt_module.parameters(), max_norm=1.0)
-                    adapt_optimizer.step()
+                    with torch.enable_grad():
+                        adapt_optimizer.zero_grad(set_to_none=True)
+                        pred = adapt_module(history.reshape(num_envs, -1).to(args.device))
+                        loss = torch.nn.functional.mse_loss(pred, z_t_teacher.detach())
+                        loss.backward()
+                        torch.nn.utils.clip_grad_norm_(adapt_module.parameters(), max_norm=1.0)
+                        adapt_optimizer.step()
 
                 if len(chunk_histories) >= args.save_every:
                     _write_chunk(output_dir, chunk_idx, chunk_histories, chunk_targets)
                     chunk_idx += 1
                     chunk_histories, chunk_targets = [], []
+                    
+            # Log progress
+            if step > 0 and step % 500 == 0:
+                print(f"[INFO] Collected {step}/{args.num_steps} steps, {chunk_idx} chunks saved")
 
             obs = next_obs
 
@@ -314,24 +362,56 @@ def train_adaptation(args, dataset_dir: Path) -> Path:
     histories, targets = _load_dataset_chunks(dataset_dir)
     input_dim = histories.shape[-1]
     latent_dim = targets.shape[-1]
+    
+    print(f"[INFO] Dataset loaded:")
+    print(f"       Samples:    {histories.shape[0]}")
+    print(f"       Input dim:  {input_dim}")
+    print(f"       Latent dim: {latent_dim}")
+
+    # Use deeper network for larger inputs
+    if input_dim > 10000:
+        hidden_dims = (512, 256, 128)
+    elif input_dim > 5000:
+        hidden_dims = (256, 256, 128)
+    else:
+        hidden_dims = (256, 128)
+    
+    print(f"       Hidden dims: {hidden_dims}")
 
     cfg = AdaptationModuleCfg(
         in_dim=input_dim,
         latent_dim=latent_dim,
-        hidden_dims=(256, 128),
+        hidden_dims=hidden_dims,
         activation="elu",
     )
     model = AdaptationModule(cfg=cfg).to(args.device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=0.5, patience=5, verbose=True
+    )
     loss_fn = nn.MSELoss()
 
-    dataset = TensorDataset(histories, targets)
-    loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True)
+    # Train/val split (90/10)
+    n_samples = histories.shape[0]
+    n_val = max(1, int(0.1 * n_samples))
+    perm = torch.randperm(n_samples)
+    train_idx, val_idx = perm[n_val:], perm[:n_val]
+    
+    train_dataset = TensorDataset(histories[train_idx], targets[train_idx])
+    val_dataset = TensorDataset(histories[val_idx], targets[val_idx])
+    
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, drop_last=True)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
+    
+    print(f"       Train samples: {len(train_idx)}")
+    print(f"       Val samples:   {len(val_idx)}")
 
+    best_val_loss = float("inf")
     model.train()
     for epoch in range(1, args.epochs + 1):
-        epoch_loss = 0.0
-        for batch_hist, batch_tgt in loader:
+        # Training
+        train_loss = 0.0
+        for batch_hist, batch_tgt in train_loader:
             batch_hist = batch_hist.to(args.device)
             batch_tgt = batch_tgt.to(args.device)
             pred = model(batch_hist)
@@ -340,9 +420,32 @@ def train_adaptation(args, dataset_dir: Path) -> Path:
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
-            epoch_loss += loss.item()
-        avg_loss = epoch_loss / max(1, len(loader))
-        print(f"[Epoch {epoch:03d}] loss={avg_loss:.6f}")
+            train_loss += loss.item()
+        avg_train_loss = train_loss / max(1, len(train_loader))
+        
+        # Validation
+        model.eval()
+        val_loss = 0.0
+        with torch.no_grad():
+            for batch_hist, batch_tgt in val_loader:
+                batch_hist = batch_hist.to(args.device)
+                batch_tgt = batch_tgt.to(args.device)
+                pred = model(batch_hist)
+                val_loss += loss_fn(pred, batch_tgt).item()
+        avg_val_loss = val_loss / max(1, len(val_loader))
+        model.train()
+        
+        scheduler.step(avg_val_loss)
+        
+        # Save best model
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            best_state = copy.deepcopy(model.state_dict())
+        
+        print(f"[Epoch {epoch:03d}] train_loss={avg_train_loss:.6f}  val_loss={avg_val_loss:.6f}  best_val={best_val_loss:.6f}")
+
+    # Load best model
+    model.load_state_dict(best_state)
 
     output_dir = dataset_dir / "adaptation_model"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -352,6 +455,7 @@ def train_adaptation(args, dataset_dir: Path) -> Path:
             "model_state_dict": model.state_dict(),
             "cfg": asdict(cfg),
             "dataset_dir": str(dataset_dir),
+            "best_val_loss": best_val_loss,
         },
         out_path,
     )
@@ -364,7 +468,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--task", type=str, default="Unitree-H12-Walk-RMA-v0")
     parser.add_argument("--policy_checkpoint", type=str, default=None, help="Policy checkpoint (.pt)")
     parser.add_argument("--encoder_checkpoint", type=str, default=None, help="Encoder checkpoint (.pt)")
-    parser.add_argument("--history_len", type=int, default=50, help="History length H")
+    parser.add_argument("--history_len", type=int, default=20, help="History length H (recommended: 10-30, since obs already has 5-frame stacking)")
     parser.add_argument("--num_steps", type=int, default=5000, help="Steps to collect for dataset")
     parser.add_argument("--num_envs", type=int, default=16, help="Number of environments")
     parser.add_argument("--dataset_dir", type=str, default=None, help="Output dataset directory")
